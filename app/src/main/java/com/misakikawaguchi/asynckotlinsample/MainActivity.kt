@@ -2,6 +2,8 @@ package com.misakikawaguchi.asynckotlinsample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
 
@@ -35,6 +37,8 @@ class MainActivity : AppCompatActivity() {
         val adapter = SimpleAdapter(applicationContext, _list, android.R.layout.simple_list_item_1, from, to)
         lvCityList.adapter = adapter
 
+        // リストをタップ
+        lvCityList.onItemClickListener = ListItemClickListener()
     }
 
     // リストビューに表示させる天気ポイントリストデータを生成するメソッド
@@ -59,5 +63,24 @@ class MainActivity : AppCompatActivity() {
         list.add(city)
 
         return  list
+    }
+
+    // リストがタップされた時の処理が記述されたリスナクラス
+    private inner class ListItemClickListener : AdapterView.OnItemClickListener {
+        override fun onItemClick(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+
+            // クリックしたデータの番号を取得
+            val item = _list.get(position)
+
+            // q：天気情報を表示させる都市名をアルファベットで指定
+            // クリックしたデータの都市名を取得
+            val q = item.get("q")
+
+            // nullではない時に処理が実行
+            q?.let {
+                // urlを取得
+                val url = "$WEATHERINFO_URL&q=$q&appid=$APP_ID"
+            }
+        }
     }
 }
