@@ -16,6 +16,9 @@ class MainActivity : AppCompatActivity() {
         private const val APP_ID = ""
     }
 
+    // リストビューに表示させるリストデータ
+    private var _list: MutableList<MutableMap<String, String>> = mutableListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
