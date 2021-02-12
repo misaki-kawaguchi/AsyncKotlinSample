@@ -162,4 +162,22 @@ class MainActivity : AppCompatActivity() {
         tvWeatherDesc.text = desc
     }
 
+    // InputStreamオブジェクトを文字列に変換するメソッド。 変換文字コードはUTF-8。
+    private fun is2String(stream: InputStream): String {
+        // Stringクラスを使って文字列を連結する
+        val sb = StringBuilder()
+        // データをUTF-8に変換してから配列にしてバッファに取り込む（設定しないと文字化けする）
+        val reader = BufferedReader(InputStreamReader(stream, "UTF-8"))
+        // バッファの１行を取り出す
+        var line = reader.readLine()
+        // 取り出したデータがnullでない場合
+        while(line != null) {
+            // 文字列に追加する
+            sb.append(line)
+            line = reader.readLine()
+        }
+        reader.close()
+        return sb.toString()
+    }
+
 }
