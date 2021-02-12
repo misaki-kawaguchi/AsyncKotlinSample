@@ -106,6 +106,8 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             // 非同期でお天気情報APIにアクセスする
             val result = backgroundTaskRunner(url)
+            // JSON解析と画面表示処理を行う
+            postExecutorRunner(result)
         }
     }
 
@@ -135,6 +137,29 @@ class MainActivity : AppCompatActivity() {
             result
         }
         return returnVal
+    }
+
+    // 取得したお天気情報を画面に表示するメソッド。
+    @UiThread
+    private fun postExecutorRunner(result: String) {
+        // JSONObjectを定義
+        val rootJSON = JSONObject(result)
+        // getStringで値（都市名）を取得
+        val cityName = rootJSON.getString("name")
+        // JSONデータ（天気）を取得して配列に代入する
+        val weatherJSONArray = rootJSON.getJSONArray("weather")
+        // 配列からJSONデータを取得する
+        val weatherJSON = weatherJSONArray.getJSONObject(0)
+        val description = weatherJSON.getString("description")
+        val telop = cityName + "の天気"
+        val desc = "現在は" + description + "です。"
+
+        val tvWeatherTelop = findViewById<TextView>(R.id.tvWeatherTelop)
+        val tvWeatherDesc = findViewById<TextView>(R.id.tvWeatherDesc)
+        // ○○の天気
+        tvWeatherTelop.text = telop
+        // 現在は○○です
+        tvWeatherDesc.text = desc
     }
 
 }
