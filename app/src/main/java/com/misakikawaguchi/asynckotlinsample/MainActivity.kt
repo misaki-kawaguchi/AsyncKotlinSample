@@ -6,6 +6,19 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import android.widget.TextView
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
@@ -76,11 +89,52 @@ class MainActivity : AppCompatActivity() {
             // クリックしたデータの都市名を取得
             val q = item.get("q")
 
-            // nullではない時に処理が実行
+            // nullではない時に処理が実行される
             q?.let {
                 // urlを取得
                 val url = "$WEATHERINFO_URL&q=$q&appid=$APP_ID"
+                // お天気情報の取得処理を行う
+                asyncExecute(url)
             }
         }
     }
+
+    // お天気情報の取得処理を行うメソッド
+    @UiThread
+    private fun asyncExecute(url: String) {
+        // ライフサイクルオブジェクトごとに定義され、 対応するライフサイクルが破棄（destroy）されると、コルーチンもキャンセルされるようになる
+        lifecycleScope.launch {
+            // 非同期でお天気情報APIにアクセスする
+            val result = backgroundTaskRunner(url)
+        }
+    }
+
+    // 非同期でお天気情報APIにアクセスするためのクラス
+    @WorkerThread
+    private suspend fun backgroundTaskRunner(url: String): String {
+        // メソッド内の処理スレッドを分ける
+        // メインスレッドの外部でディスクまたはネットワークの I/O を実行する場合に適している
+        val returnVal = withContext(Dispatchers.IO) {
+            var result = ""
+            // URLオブジェクトを生成
+            val url = URL(url)
+            // URlオブジェクトを使ってHttpURLConnectionオブジェクトを作成
+            val con = url.openConnection() as? HttpURLConnection
+            con?.run {
+                // 接続メソッドをGETに設定
+                requestMethod = "GET"
+                // 接続
+                connect()
+                // レスポンスデータ(inputStream)を文字列(JSON)に変換
+                result = is2String(inputStream)
+                // HttpURLConnectionオブジェクトを解放
+                disconnect()
+                // InputStreamオブジェクトを解放
+                inputStream.close()
+            }
+            result
+        }
+        return returnVal
+    }
+
 }
