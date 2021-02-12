@@ -120,16 +120,19 @@ class MainActivity : AppCompatActivity() {
             var result = ""
             // URLオブジェクトを生成
             val url = URL(url)
-            // URlオブジェクトを使ってHttpURLConnectionオブジェクトを作成
+            // URlオブジェクトからHttpURLConnectionオブジェクトを取得（HTTP接続を行うため）
+            // 取得するにはopenConnection()を使うが、戻り値の型はURLConnectionなのでHttpURLConnectionにキャストする
             val con = url.openConnection() as? HttpURLConnection
             con?.run {
-                // 接続メソッドをGETに設定
+                // http接続メソッドを設定
                 requestMethod = "GET"
                 // 接続
                 connect()
-                // レスポンスデータ(inputStream)を文字列(JSON)に変換
+                // HttpURLConnectionオブジェクトからレスポンスデータを取得（天気情報が格納）
+                // レスポンスデータであるInputStreamオブジェクトを文字列（JSON文字列）に変換
                 result = is2String(inputStream)
                 // HttpURLConnectionオブジェクトを解放
+                // これを行う前にJSON文字列に変換
                 disconnect()
                 // InputStreamオブジェクトを解放
                 inputStream.close()
@@ -142,7 +145,7 @@ class MainActivity : AppCompatActivity() {
     // 取得したお天気情報を画面に表示するメソッド。
     @UiThread
     private fun postExecutorRunner(result: String) {
-        // JSONObjectを定義
+        // JSON文字列からJSONObjectオブジェクトを生成。これをルートオブジェクトとする。
         val rootJSON = JSONObject(result)
         // getStringで値（都市名）を取得
         val cityName = rootJSON.getString("name")
