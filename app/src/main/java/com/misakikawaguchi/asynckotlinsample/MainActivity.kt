@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        _list = createList()
+
         // リストのIDを取得
         val lvCityList = findViewById<ListView>(R.id.lvCityList)
         // アダプタの作成
@@ -32,5 +34,30 @@ class MainActivity : AppCompatActivity() {
         val to = intArrayOf(android.R.id.text1)
         val adapter = SimpleAdapter(applicationContext, _list, android.R.layout.simple_list_item_1, from, to)
         lvCityList.adapter = adapter
+
+    }
+
+    // リストビューに表示させる天気ポイントリストデータを生成するメソッド
+    private fun createList(): MutableList<MutableMap<String, String>> {
+        val list:MutableList<MutableMap<String, String>> = mutableListOf()
+
+        var city = mutableMapOf("name" to "大阪", "q" to "Osaka")
+        list.add(city)
+        city = mutableMapOf("name" to "神戸", "q" to "Kobe")
+        list.add(city)
+        city = mutableMapOf("name" to "京都", "q" to "Kyoto")
+        list.add(city)
+        city = mutableMapOf("name" to "大津", "q" to "Otsu")
+        list.add(city)
+        city = mutableMapOf("name" to "奈良", "q" to "Nara")
+        list.add(city)
+        city = mutableMapOf("name" to "和歌山", "q" to "Wakayama")
+        list.add(city)
+        city = mutableMapOf("name" to "姫路", "q" to "Himeji")
+        list.add(city)
+        city = mutableMapOf("name" to "東京", "q" to "Tokyo")
+        list.add(city)
+
+        return  list
     }
 }
